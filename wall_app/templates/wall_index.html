@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Wall</title>
+</head>
+<body>
+    <header>
+        <h1>The Wall</h1>
+        <!-- {% if messages %}
+        <ul class="messages">    
+            {% for message in messages %}    
+                <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>    
+            {% endfor %}
+        </ul>
+        {% endif %} -->
+        <h2>Welcome {{request.session.first_name}}</h2>
+        <a href="/users/logout">Logout</a>
+    </header>
+    <section class="posting_comments">
+        <form action="/wall/posts/create" method="POST">
+            {%csrf_token%}
+            Post a message: <br>
+            <textarea name="post_message" cols="30" rows="10" placeholder="Post a message..."></textarea><br>
+            <input type="submit">
+        </form>
+    </section>
+    <section class="post_list">
+        {% for post in posts %}
+            <div>
+                <h3>{{post.user.first_name}} {{post.user.last_name}} </h3>
+                <p>{{post.post_message}}</p>
+                {% if request.session.user_id == post.user.id and post.age < 30 %}
+                <a href="/wall/posts/{{post.id}}/delete">Delete Post</a>{% endif %}
+            </div>
+            <div>
+            {% for comment in post.comment.all %}
+                <h4>{{comment.user.first_name}} {{comment.user.last_name}}</h4>
+                <p>{{comment.comment_message}}</p>
+                {% if request.session.user_id == comment.user.id and comment.age < 30 %}
+                <a href="/wall/comments/{{comment.id}}/delete">Delete Comment</a>
+                {% endif %}
+            {% endfor %}
+            </div>
+            </section>
+            <form action="/wall/comments/create" method="POST">
+                {%csrf_token%}
+                <textarea name="post_comment" cols="30" rows="1" placeholder="Post a comment..."></textarea>
+                <input type="hidden" name="post_id" value="{{post.id}}"><br>
+                <input type="submit">
+            </form>
+        {% endfor %}
+    </main>
+
+</body>
+</html>
